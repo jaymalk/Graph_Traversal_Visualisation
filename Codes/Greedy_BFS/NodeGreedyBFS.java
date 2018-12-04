@@ -16,7 +16,15 @@ public class NodeGreedyBFS extends Node implements Comparable<NodeGreedyBFS> {
     }
 
     public void putInHeap() {
-        this.inHeap = true;
+        try {
+            assert(!block):"Node is blocked. Can't put it in heap.";
+                this.color = StdDraw.YELLOW;
+                this.inHeap = true;
+                draw();
+        }
+        catch(AssertionError e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void setHeuristicValue(int xf, int yf) {

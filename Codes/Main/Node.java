@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.*;
 import java.awt.Color;
+import java.awt.Font;
 
 public class Node {
     protected boolean block, processed, inQueue;
@@ -14,6 +15,7 @@ public class Node {
         this.inQueue = false;
         this.x = x;
         this.y = y;
+        StdDraw.setFont(new Font("Cordia", Font.PLAIN, 10));
     }
 
     public int x() {
@@ -50,7 +52,7 @@ public class Node {
     public void process() {
         try {
             assert(!block):"Node is blocked. Can't traverse it.";
-                this.color = StdDraw.BLUE;
+                this.color = StdDraw.RED;
                 this.processed = true;
                 draw();
         }
@@ -62,7 +64,7 @@ public class Node {
     public void finalise() {
         try {
             assert(processed):"Node is not yet processed. Can't finalise it.";
-                this.color = StdDraw.GREEN;
+                this.color = StdDraw.BLUE;
                 draw();
         }
         catch(AssertionError e) {

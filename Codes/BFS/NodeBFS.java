@@ -14,7 +14,15 @@ public class NodeBFS extends Node {
     }
 
     public void queue() {
-        this.inQueue = true;
+        try {
+            assert(!block):"Node is blocked. Can't put it in queue.";
+                this.color = StdDraw.YELLOW;
+                this.inQueue = true;
+                draw();
+        }
+        catch(AssertionError e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public NodeBFS parent() {

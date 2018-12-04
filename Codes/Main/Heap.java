@@ -2,8 +2,8 @@ import java.util.Arrays;
 
 @SuppressWarnings("unchecked")
 public class Heap<X extends Comparable<? super X>> {
-    int lastAdd;
-    public X[] heapArray;
+    private int lastAdd;
+    private X[] heapArray;
 
     public Heap(X first) {
         heapArray = (X[])new Comparable[3];
@@ -24,18 +24,31 @@ public class Heap<X extends Comparable<? super X>> {
     public void Insert(X a) {
         if(lastAdd+1 == heapArray.length)
             heapArray = increaseheight(heapArray);
-        if(lastAdd%2 == 0) {
-            lastAdd+=1;
-            heapArray[lastAdd] = a;
-        }
-        else {
-            lastAdd+=1;
-            heapArray[lastAdd] = a;
-        }
+        lastAdd+=1;
+        heapArray[lastAdd] = a;
         bubbleUpHeapify(lastAdd);
     }
 
-    public void bubbleUpHeapify(int index) {
+    public void updateOnItem(X a) {
+        int i = getItemIndex(a);
+        if(i == -1) {
+            System.out.println("Item not present in the heap.");
+            return;
+        }
+        X item = removeAtIndex(i);
+        Insert(item);
+    }
+
+    public int getItemIndex(X a) {
+        for(int i=0; i<heapArray.length; i++)
+            if(heapArray[i] == null)
+                return -1;
+            else if(heapArray[i].equals(a))
+                return i;
+        return -1;
+    }
+
+    private void bubbleUpHeapify(int index) {
         if(index<=0)
             return;
         X child = heapArray[index];
@@ -57,22 +70,50 @@ public class Heap<X extends Comparable<? super X>> {
         return removed;
     }
 
-    public void bubbleDownHeapify(int index) {
+    private X removeLast() {
+        X last = heapArray[lastAdd];
+        heapArray[lastAdd] = null;
+        lastAdd -= 1;
+        return last;
+    }
+
+    private X removeAtIndex(int i) {
+        if(i == 0) {
+            return removeMin();
+        }
+        if(i == lastAdd) {
+            return removeLast();
+        }
+        try {
+            X removed = heapArray[i];
+            X temp = removeLast();
+            heapArray[i] = temp;
+            bubbleUpHeapify(i);
+            bubbleDownHeapify(i);
+            return removed;
+        }
+        catch(ArrayIndexOutOfBoundsException e) {
+            System.out.println("Index is out of bound.");
+            return null;
+        }
+    }
+
+    private void bubbleDownHeapify(int index) {
         if(isExternal(index))
             return;
         if(right(index) == -1) {
-            if(heapArray[left(index)].compareTo(heapArray[index]) <= 0)
+            if(heapArray[left(index)].compareTo(heapArray[index]) < 0)
                 swapData(left(index), index);
         }
         else {
-            if(heapArray[left(index)].compareTo(heapArray[right(index)]) <= 0) {
-                if(heapArray[left(index)].compareTo(heapArray[index]) <= 0) {
+            if(heapArray[left(index)].compareTo(heapArray[right(index)]) < 0) {
+                if(heapArray[left(index)].compareTo(heapArray[index]) < 0) {
                     swapData(index, left(index));
                     bubbleDownHeapify(left(index));
                 }
             }
             else {
-                if(heapArray[right(index)].compareTo(heapArray[index]) <= 0) {
+                if(heapArray[right(index)].compareTo(heapArray[index]) < 0) {
                     swapData(index, right(index));
                     bubbleDownHeapify(right(index));
                 }
@@ -80,7 +121,7 @@ public class Heap<X extends Comparable<? super X>> {
         }
     }
 
-    public int left(int index) {
+    private int left(int index) {
         if(2*index+1 >= heapArray.length)
             return -1;
         if(heapArray[2*index+1] == null)
@@ -88,7 +129,7 @@ public class Heap<X extends Comparable<? super X>> {
         return 2*index+1;
     }
 
-    public int right(int index) {
+    private int right(int index) {
         if(2*index+2 >= heapArray.length)
             return -1;
         if(heapArray[2*index+2] == null)
@@ -96,7 +137,7 @@ public class Heap<X extends Comparable<? super X>> {
         return 2*index+2;
     }
 
-    public boolean isExternal(int index) {
+    private boolean isExternal(int index) {
         boolean is = false;
         if(left(index)!=-1)
             is = is || (heapArray[left(index)] != null);
@@ -105,13 +146,13 @@ public class Heap<X extends Comparable<? super X>> {
         return !is;
     }
 
-    public void swapData(int index1, int index2) {
+    private void swapData(int index1, int index2) {
         X temp = heapArray[index1];
         heapArray[index1] = heapArray[index2];
         heapArray[index2] = temp;
     }
 
-    public X[] increaseheight(X[] arr) {
+    private X[] increaseheight(X[] arr) {
         X[] newArr = (X[])new Comparable[arr.length*2+1];
         for(int i=0; i<arr.length; i++)
             newArr[i] = arr[i];

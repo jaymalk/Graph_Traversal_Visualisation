@@ -14,7 +14,15 @@ public class NodeDFS extends Node {
     }
 
     public void stack() {
-        this.inStack = true;
+        try {
+            assert(!block):"Node is blocked. Can't put it in heap.";
+                this.color = StdDraw.YELLOW;
+                this.inStack = true;
+                draw();
+        }
+        catch(AssertionError e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public NodeDFS parent() {
