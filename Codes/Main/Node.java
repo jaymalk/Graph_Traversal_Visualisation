@@ -10,7 +10,7 @@ public class Node {
     public Node(int x, int y) {
         this.block = false;
         this.processed = false;
-        this.color = Color.WHITE;
+        this.color = Color.LIGHT_GRAY;
         this.inQueue = false;
         this.x = x;
         this.y = y;
@@ -50,7 +50,7 @@ public class Node {
     public void process() {
         try {
             assert(!block):"Node is blocked. Can't traverse it.";
-                this.color = StdDraw.RED;
+                this.color = StdDraw.BLUE;
                 this.processed = true;
                 draw();
         }
@@ -60,8 +60,14 @@ public class Node {
     }
 
     public void finalise() {
-        this.color = StdDraw.YELLOW;
-        draw();
+        try {
+            assert(processed):"Node is not yet processed. Can't finalise it.";
+                this.color = StdDraw.GREEN;
+                draw();
+        }
+        catch(AssertionError e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void draw() {

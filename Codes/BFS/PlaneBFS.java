@@ -104,6 +104,7 @@ public class PlaneBFS{
         current = nodesInProcess.dequeue();
         if(current.x() == finalX && current.y() == finalY) {
             traveled = true;
+            current.process();
             showPath();
         }
     }

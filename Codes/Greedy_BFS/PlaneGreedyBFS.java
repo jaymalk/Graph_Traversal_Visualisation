@@ -1,22 +1,22 @@
 import edu.princeton.cs.algs4.*;
 
-public class PlaneDFS {
-    private MyStack<NodeDFS> nodesInProcess;
+public class PlaneGreedyBFS{
     protected int size, totalSteps, finalX, finalY;
-    protected NodeDFS sites[][], current;
+    protected NodeGreedyBFS sites[][], current;
     protected boolean traveled;
+    private Heap<NodeGreedyBFS> nodesInProcess;
 
-    public PlaneDFS(int size) {
+    public PlaneGreedyBFS(int size) {
         this.size = size;
         this.totalSteps = 1;
         this.current = null;
         this.traveled = false;
         this.finalX = size-1;
         this.finalY = size-1;
-        sites = new NodeDFS[size][size];
-        this.nodesInProcess = new MyStack<>();
+        this.nodesInProcess = new Heap<>();
+        this.sites = new NodeGreedyBFS[size][size];
         BuildGrid(size);
-        this.showGrid();
+        showGrid();
     }
 
     protected void BuildGrid(int size) {
@@ -51,6 +51,9 @@ public class PlaneDFS {
                 throw new IllegalArgumentException();
             this.finalX = i;
             this.finalY = j;
+            for(NodeGreedyBFS[] L: sites)
+                for(NodeGreedyBFS node: L)
+                    node.setHeuristicValue(i, j);
             StdDraw.setPenColor(StdDraw.GREEN);
             StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
         }
@@ -66,7 +69,8 @@ public class PlaneDFS {
         StdDraw.enableDoubleBuffering();
         for(int i=0; i<size; i++)
             for(int j=0; j<size; j++) {
-                sites[i][j] = new NodeDFS(i, j);
+                sites[i][j] = new NodeGreedyBFS(i, j);
+                sites[i][j].setHeuristicValue(size-1, size-1);
                 sites[i][j].draw();
             }
         this.current = sites[0][0];
@@ -84,24 +88,24 @@ public class PlaneDFS {
         current.process();
         if(isValid(current.x(), current.y()+1)) {
             sites[current.x()][current.y()+1].setParent(current);
-            putInStack(current.x(), current.y()+1);
+            putInHeap(current.x(), current.y()+1);
         }
         if(isValid(current.x()+1, current.y())) {
             sites[current.x()+1][current.y()].setParent(current);
-            putInStack(current.x()+1, current.y());
+            putInHeap(current.x()+1, current.y());
         }
         if(isValid(current.x(), current.y()-1)) {
             sites[current.x()][current.y()-1].setParent(current);
-            putInStack(current.x(), current.y()-1);
+            putInHeap(current.x(), current.y()-1);
         }
         if(isValid(current.x()-1, current.y())) {
             sites[current.x()-1][current.y()].setParent(current);
-            putInStack(current.x()-1, current.y());
+            putInHeap(current.x()-1, current.y());
         }
         if(nodesInProcess.isEmpty())
             if(!traveled)
                 throw new IllegalStateException("This maze is not solvable.");
-        current = nodesInProcess.pop();
+        current = nodesInProcess.removeMin();
         if(current.x() == finalX && current.y() == finalY) {
             traveled = true;
             current.process();
@@ -112,14 +116,14 @@ public class PlaneDFS {
     private boolean isValid(int i, int j) {
         if(i<0 || i>=size || j<0 || j>= size)
             return false;
-        if(sites[i][j].processed() || sites[i][j].isBlocked() || sites[i][j].inStack())
+        if(sites[i][j].processed() || sites[i][j].isBlocked() || sites[i][j].inHeap())
             return false;
         return true;
     }
 
-    private void putInStack(int i, int j) {
-        sites[i][j].stack();
-        nodesInProcess.push(sites[i][j]);
+    private void putInHeap(int i, int j) {
+        sites[i][j].putInHeap();
+        nodesInProcess.Insert(sites[i][j]);
     }
 
     protected void showPath() {
