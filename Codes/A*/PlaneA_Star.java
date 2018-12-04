@@ -1,13 +1,13 @@
 import edu.princeton.cs.algs4.*;
 import java.awt.Font;
 
-public class PlaneDijkstra{
+public class PlaneA_Star{
     protected int size, totalSteps, finalX, finalY;
-    protected NodeDijkstra sites[][], current;
+    protected NodeA_Star sites[][], current;
     protected boolean traveled;
-    private Heap<NodeDijkstra> nodesInProcess;
+    private Heap<NodeA_Star> nodesInProcess;
 
-    public PlaneDijkstra(int size) {
+    public PlaneA_Star(int size) {
         this.size = size;
         this.totalSteps = 1;
         this.current = null;
@@ -15,7 +15,7 @@ public class PlaneDijkstra{
         this.finalX = size-1;
         this.finalY = size-1;
         this.nodesInProcess = new Heap<>();
-        this.sites = new NodeDijkstra[size][size];
+        this.sites = new NodeA_Star[size][size];
         BuildGrid(size);
         showGrid();
     }
@@ -52,6 +52,9 @@ public class PlaneDijkstra{
                 throw new IllegalArgumentException();
             this.finalX = i;
             this.finalY = j;
+            for(NodeA_Star[] L: sites)
+                for(NodeA_Star node: L)
+                    node.setGreedyValue(i, j);
             StdDraw.setPenColor(StdDraw.GREEN);
             StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
         }
@@ -63,16 +66,13 @@ public class PlaneDijkstra{
         }
     }
 
-    public void increaseCost(int i, int j) {
-        sites[i][j].increaseCost();
-    }
-
     protected void showGrid() {
         StdDraw.enableDoubleBuffering();
         for(int i=0; i<size; i++)
             for(int j=0; j<size; j++) {
-                sites[i][j] = new NodeDijkstra(i, j);
-                    sites[i][j].draw();
+                sites[i][j] = new NodeA_Star(i, j);
+                sites[i][j].setGreedyValue(size-1, size-1);
+                sites[i][j].draw();
             }
         this.current = sites[0][0];
         StdDraw.show();

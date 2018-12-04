@@ -83,8 +83,10 @@ public class PlaneGreedyBFS{
     }
 
     public void nextStep() {
-        if(totalSteps++ == 1)
+        if(totalSteps++ == 1) {
+            current.putInHeap();
             current.setParent(null);
+        }
         current.process();
         if(isValid(current.x(), current.y()+1)) {
             sites[current.x()][current.y()+1].setParent(current);
