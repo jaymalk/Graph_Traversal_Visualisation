@@ -1,5 +1,5 @@
-import edu.princeton.cs.algs4.*;
-import java.awt.Font;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class PlaneDijkstra{
     protected int size, totalSteps, finalX, finalY;
@@ -18,10 +18,82 @@ public class PlaneDijkstra{
         this.sites = new NodeDijkstra[size][size];
         BuildGrid(size);
         showGrid();
+        startSimulation();
+    }
+
+    private void startSimulation() {
+        int start = 0;
+        int mode = 0;
+        while(true) {
+
+            if(start == 0) {
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_A))
+                    mode = 1;
+
+                try {
+                    if(StdDraw.isMousePressed()) {
+                        int x = (int)StdDraw.mouseX();
+                        int y = (int)StdDraw.mouseY();
+                        if(mode == 1)
+                            sites[x][y].increaseCost();
+                    }
+                }
+                catch(Exception e) {}
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_ENTER))
+                    start = 1;
+
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
+                    while(true) {
+                        mode = 0;
+                        if(StdDraw.isMousePressed()) {
+                            int x = (int)StdDraw.mouseX();
+                            int y = (int)StdDraw.mouseY();
+                            setStartPosition(x, y);
+                            break;
+                        }
+                    }
+                }
+                if(StdDraw.isKeyPressed(KeyEvent.VK_E)) {
+                    while(true) {
+                        mode = 0;
+                        if(StdDraw.isMousePressed()) {
+                            int x = (int)StdDraw.mouseX();
+                            int y = (int)StdDraw.mouseY();
+                            setEndPosition(x, y);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            else if(start == 1) {
+                try {
+                    Thread.sleep(1);
+                    nextStep();
+                }
+                catch(Exception e){};
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_ENTER))
+                    start = 2;
+            }
+
+            else {
+                if(StdDraw.isKeyPressed(KeyEvent.VK_ENTER))
+                    start = 1;
+            }
+
+            if(StdDraw.isKeyPressed(KeyEvent.VK_X)) {
+                return;
+            }
+        }
     }
 
     protected void BuildGrid(int size) {
-        StdDraw.setCanvasSize(750, 750);
+        int height = (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.2);
+        StdDraw.setCanvasSize(height, height);
         StdDraw.setXscale(-1, size+1);
         StdDraw.setYscale(-1, size+1);
         StdDraw.setPenRadius(0.005);
@@ -52,7 +124,7 @@ public class PlaneDijkstra{
                 throw new IllegalArgumentException();
             this.finalX = i;
             this.finalY = j;
-            StdDraw.setPenColor(StdDraw.GREEN);
+            StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
             StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {

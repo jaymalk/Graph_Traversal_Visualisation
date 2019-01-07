@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.*;
 import java.awt.Color;
 
 public class NodeGreedyBFS extends Node implements Comparable<NodeGreedyBFS> {

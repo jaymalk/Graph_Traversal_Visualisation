@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.*;
 import java.awt.Color;
 
 public class NodeA_Star extends Node implements Comparable<NodeA_Star> {

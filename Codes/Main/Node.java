@@ -1,4 +1,4 @@
-import edu.princeton.cs.algs4.*;
+
 import java.awt.Color;
 import java.awt.Font;
 
@@ -26,9 +26,23 @@ public class Node {
         return this.y;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public void block() {
+        if(color == StdDraw.GREEN || color == StdDraw.PRINCETON_ORANGE)
+            return;
         this.block = true;
         this.color = StdDraw.BLACK;
+        draw();
+    }
+
+    public void unblock() {
+        if(color == StdDraw.GREEN || color == StdDraw.PRINCETON_ORANGE)
+            return;
+        this.block = false;
+        this.color = StdDraw.LIGHT_GRAY;
         draw();
     }
 

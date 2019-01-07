@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.*;
 import java.awt.Color;
 
 public class NodeBFS extends Node {

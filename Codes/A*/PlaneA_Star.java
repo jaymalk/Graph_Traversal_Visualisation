@@ -1,5 +1,5 @@
-import edu.princeton.cs.algs4.*;
 import java.awt.Font;
+import java.awt.Toolkit;
 
 public class PlaneA_Star{
     protected int size, totalSteps, finalX, finalY;
@@ -21,7 +21,8 @@ public class PlaneA_Star{
     }
 
     protected void BuildGrid(int size) {
-        StdDraw.setCanvasSize(750, 750);
+        int height = (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.2);
+        StdDraw.setCanvasSize(height, height);
         StdDraw.setXscale(-1, size+1);
         StdDraw.setYscale(-1, size+1);
         StdDraw.setPenRadius(0.005);
