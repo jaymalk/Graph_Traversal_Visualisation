@@ -1,21 +1,21 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class PlaneGreedyBFS{
+public class PlaneBFS{
     protected int size, totalSteps, finalX, finalY;
-    protected NodeGreedyBFS sites[][], current;
+    protected NodeBFS sites[][], current;
     protected boolean traveled;
-    private Heap<NodeGreedyBFS> nodesInProcess;
+    private MyQueue<NodeBFS> nodesInProcess;
 
-    public PlaneGreedyBFS(int size) {
+    public PlaneBFS(int size) {
         this.size = size;
         this.totalSteps = 1;
         this.current = null;
         this.traveled = false;
         this.finalX = size-1;
         this.finalY = size-1;
-        this.nodesInProcess = new Heap<>();
-        this.sites = new NodeGreedyBFS[size][size];
+        this.nodesInProcess = new MyQueue<>();
+        this.sites = new NodeBFS[size][size];
         BuildGrid(size);
         showGrid();
         startSimulation();
@@ -114,7 +114,7 @@ public class PlaneGreedyBFS{
             if(this.current.isBlocked())
                 this.current.unblock();
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -134,12 +134,8 @@ public class PlaneGreedyBFS{
             this.finalY = j;
             if(this.sites[i][j].isBlocked())
                 this.sites[i][j].unblock();
-            for(int x=0; x<size; x++)
-                for(int y=0; y<size; y++) {
-                    sites[x][y].setHeuristicValue(i, j);
-                }
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");
@@ -153,8 +149,7 @@ public class PlaneGreedyBFS{
         StdDraw.enableDoubleBuffering();
         for(int i=0; i<size; i++)
             for(int j=0; j<size; j++) {
-                sites[i][j] = new NodeGreedyBFS(i, j);
-                sites[i][j].setHeuristicValue(size-1, size-1);
+                sites[i][j] = new NodeBFS(i, j);
                 sites[i][j].draw();
             }
         this.current = sites[0][0];
@@ -167,31 +162,29 @@ public class PlaneGreedyBFS{
     }
 
     public void nextStep() {
-        if(totalSteps++ == 1) {
-            current.putInHeap();
+        if(totalSteps++ == 1)
             current.setParent(null);
-        }
         current.process();
         if(isValid(current.x(), current.y()+1)) {
             sites[current.x()][current.y()+1].setParent(current);
-            putInHeap(current.x(), current.y()+1);
+            putInQueue(current.x(), current.y()+1);
         }
         if(isValid(current.x()+1, current.y())) {
             sites[current.x()+1][current.y()].setParent(current);
-            putInHeap(current.x()+1, current.y());
+            putInQueue(current.x()+1, current.y());
         }
         if(isValid(current.x(), current.y()-1)) {
             sites[current.x()][current.y()-1].setParent(current);
-            putInHeap(current.x(), current.y()-1);
+            putInQueue(current.x(), current.y()-1);
         }
         if(isValid(current.x()-1, current.y())) {
             sites[current.x()-1][current.y()].setParent(current);
-            putInHeap(current.x()-1, current.y());
+            putInQueue(current.x()-1, current.y());
         }
         if(nodesInProcess.isEmpty())
             if(!traveled)
                 throw new IllegalStateException("This maze is not solvable.");
-        current = nodesInProcess.removeMin();
+        current = nodesInProcess.dequeue();
         if(current.x() == finalX && current.y() == finalY) {
             traveled = true;
             current.process();
@@ -202,14 +195,14 @@ public class PlaneGreedyBFS{
     private boolean isValid(int i, int j) {
         if(i<0 || i>=size || j<0 || j>= size)
             return false;
-        if(sites[i][j].processed() || sites[i][j].isBlocked() || sites[i][j].inHeap())
+        if(sites[i][j].processed() || sites[i][j].isBlocked() || sites[i][j].inQueue())
             return false;
         return true;
     }
 
-    private void putInHeap(int i, int j) {
-        sites[i][j].putInHeap();
-        nodesInProcess.Insert(sites[i][j]);
+    private void putInQueue(int i, int j) {
+        sites[i][j].queue();
+        nodesInProcess.enqueue(sites[i][j]);
     }
 
     protected void showPath() {

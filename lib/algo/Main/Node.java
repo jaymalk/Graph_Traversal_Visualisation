@@ -88,9 +88,9 @@ public class Node {
 
     public void draw() {
         StdDraw.setPenColor(color);
-        StdDraw.filledSquare(x+0.5, y+0.5, 0.5);
+        StdDraw.filledCircle(x+0.5, y+0.5, 0.5);
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.0005);
-        StdDraw.square(x+0.5, y+0.5, 0.5);
+        StdDraw.circle(x+0.5, y+0.5, 0.5);
     }
 }

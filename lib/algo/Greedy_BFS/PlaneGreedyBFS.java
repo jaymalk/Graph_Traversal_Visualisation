@@ -1,13 +1,13 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class PlaneA_Star{
+public class PlaneGreedyBFS{
     protected int size, totalSteps, finalX, finalY;
-    protected NodeA_Star sites[][], current;
+    protected NodeGreedyBFS sites[][], current;
     protected boolean traveled;
-    private Heap<NodeA_Star> nodesInProcess;
+    private Heap<NodeGreedyBFS> nodesInProcess;
 
-    public PlaneA_Star(int size) {
+    public PlaneGreedyBFS(int size) {
         this.size = size;
         this.totalSteps = 1;
         this.current = null;
@@ -15,7 +15,7 @@ public class PlaneA_Star{
         this.finalX = size-1;
         this.finalY = size-1;
         this.nodesInProcess = new Heap<>();
-        this.sites = new NodeA_Star[size][size];
+        this.sites = new NodeGreedyBFS[size][size];
         BuildGrid(size);
         showGrid();
         startSimulation();
@@ -111,8 +111,10 @@ public class PlaneA_Star{
             if(i<0 || i>=size || j<0 || j>= size)
                 throw new IllegalArgumentException();
             this.current = sites[i][j];
+            if(this.current.isBlocked())
+                this.current.unblock();
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -130,11 +132,14 @@ public class PlaneA_Star{
                 throw new IllegalArgumentException();
             this.finalX = i;
             this.finalY = j;
-            for(NodeA_Star[] L: sites)
-                for(NodeA_Star node: L)
-                    node.setGreedyValue(i, j);
+            if(this.sites[i][j].isBlocked())
+                this.sites[i][j].unblock();
+            for(int x=0; x<size; x++)
+                for(int y=0; y<size; y++) {
+                    sites[x][y].setHeuristicValue(i, j);
+                }
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");
@@ -148,28 +153,11 @@ public class PlaneA_Star{
         StdDraw.enableDoubleBuffering();
         for(int i=0; i<size; i++)
             for(int j=0; j<size; j++) {
-                sites[i][j] = new NodeA_Star(i, j);
-                sites[i][j].setGreedyValue(size-1, size-1);
+                sites[i][j] = new NodeGreedyBFS(i, j);
+                sites[i][j].setHeuristicValue(size-1, size-1);
                 sites[i][j].draw();
             }
         this.current = sites[0][0];
-        StdDraw.show();
-        StdDraw.disableDoubleBuffering();
-    }
-
-    public void redraw(boolean old) {
-        if(!traveled()) {
-            System.out.println("Complete Traversal First.");
-            return;
-        }
-        StdDraw.enableDoubleBuffering();
-        for(int i=0; i<size; i++)
-            for(int j=0; j<size; j++) {
-                if(!old)
-                    sites[i][j].draw();
-                else
-                    sites[i][j].drawOld();
-            }
         StdDraw.show();
         StdDraw.disableDoubleBuffering();
     }
@@ -180,57 +168,25 @@ public class PlaneA_Star{
 
     public void nextStep() {
         if(totalSteps++ == 1) {
-            current.setParent(null);
             current.putInHeap();
+            current.setParent(null);
         }
         current.process();
         if(isValid(current.x(), current.y()+1)) {
-            if(sites[current.x()][current.y()+1].inHeap()) {
-                if(sites[current.x()][current.y()+1].betterParent(current)) {
-                    sites[current.x()][current.y()+1].setParent(current);
-                    upDateInHeap(current.x(), current.y()+1);
-                }
-            }
-            else {
-                sites[current.x()][current.y()+1].setParent(current);
-                putInHeap(current.x(), current.y()+1);
-            }
+            sites[current.x()][current.y()+1].setParent(current);
+            putInHeap(current.x(), current.y()+1);
         }
         if(isValid(current.x()+1, current.y())) {
-            if(sites[current.x()+1][current.y()].inHeap()) {
-                if(sites[current.x()+1][current.y()].betterParent(current)) {
-                    sites[current.x()+1][current.y()].setParent(current);
-                    upDateInHeap(current.x()+1, current.y());
-                }
-            }
-            else {
-                sites[current.x()+1][current.y()].setParent(current);
-                putInHeap(current.x()+1, current.y());
-            }
+            sites[current.x()+1][current.y()].setParent(current);
+            putInHeap(current.x()+1, current.y());
         }
         if(isValid(current.x(), current.y()-1)) {
-            if(sites[current.x()][current.y()-1].inHeap()) {
-                if(sites[current.x()][current.y()-1].betterParent(current)) {
-                    sites[current.x()][current.y()-1].setParent(current);
-                    upDateInHeap(current.x(), current.y()-1);
-                }
-            }
-            else {
-                sites[current.x()][current.y()-1].setParent(current);
-                putInHeap(current.x(), current.y()-1);
-            }
+            sites[current.x()][current.y()-1].setParent(current);
+            putInHeap(current.x(), current.y()-1);
         }
         if(isValid(current.x()-1, current.y())) {
-            if(sites[current.x()-1][current.y()].inHeap()) {
-                if(sites[current.x()-1][current.y()].betterParent(current)) {
-                    sites[current.x()-1][current.y()].setParent(current);
-                    upDateInHeap(current.x()-1, current.y());
-                }
-            }
-            else {
-                sites[current.x()-1][current.y()].setParent(current);
-                putInHeap(current.x()-1, current.y());
-            }
+            sites[current.x()-1][current.y()].setParent(current);
+            putInHeap(current.x()-1, current.y());
         }
         if(nodesInProcess.isEmpty())
             if(!traveled)
@@ -246,7 +202,7 @@ public class PlaneA_Star{
     private boolean isValid(int i, int j) {
         if(i<0 || i>=size || j<0 || j>= size)
             return false;
-        if(sites[i][j].processed() || sites[i][j].isBlocked())
+        if(sites[i][j].processed() || sites[i][j].isBlocked() || sites[i][j].inHeap())
             return false;
         return true;
     }
@@ -254,10 +210,6 @@ public class PlaneA_Star{
     private void putInHeap(int i, int j) {
         sites[i][j].putInHeap();
         nodesInProcess.Insert(sites[i][j]);
-    }
-
-    private void upDateInHeap(int i, int j) {
-        nodesInProcess.updateOnItem(sites[i][j]);
     }
 
     protected void showPath() {

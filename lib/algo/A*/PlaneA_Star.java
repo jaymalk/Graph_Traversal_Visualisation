@@ -1,21 +1,21 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class PlaneBFS{
+public class PlaneA_Star{
     protected int size, totalSteps, finalX, finalY;
-    protected NodeBFS sites[][], current;
+    protected NodeA_Star sites[][], current;
     protected boolean traveled;
-    private MyQueue<NodeBFS> nodesInProcess;
+    private Heap<NodeA_Star> nodesInProcess;
 
-    public PlaneBFS(int size) {
+    public PlaneA_Star(int size) {
         this.size = size;
         this.totalSteps = 1;
         this.current = null;
         this.traveled = false;
         this.finalX = size-1;
         this.finalY = size-1;
-        this.nodesInProcess = new MyQueue<>();
-        this.sites = new NodeBFS[size][size];
+        this.nodesInProcess = new Heap<>();
+        this.sites = new NodeA_Star[size][size];
         BuildGrid(size);
         showGrid();
         startSimulation();
@@ -111,10 +111,8 @@ public class PlaneBFS{
             if(i<0 || i>=size || j<0 || j>= size)
                 throw new IllegalArgumentException();
             this.current = sites[i][j];
-            if(this.current.isBlocked())
-                this.current.unblock();
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -132,10 +130,11 @@ public class PlaneBFS{
                 throw new IllegalArgumentException();
             this.finalX = i;
             this.finalY = j;
-            if(this.sites[i][j].isBlocked())
-                this.sites[i][j].unblock();
+            for(NodeA_Star[] L: sites)
+                for(NodeA_Star node: L)
+                    node.setGreedyValue(i, j);
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");
@@ -149,10 +148,28 @@ public class PlaneBFS{
         StdDraw.enableDoubleBuffering();
         for(int i=0; i<size; i++)
             for(int j=0; j<size; j++) {
-                sites[i][j] = new NodeBFS(i, j);
+                sites[i][j] = new NodeA_Star(i, j);
+                sites[i][j].setGreedyValue(size-1, size-1);
                 sites[i][j].draw();
             }
         this.current = sites[0][0];
+        StdDraw.show();
+        StdDraw.disableDoubleBuffering();
+    }
+
+    public void redraw(boolean old) {
+        if(!traveled()) {
+            System.out.println("Complete Traversal First.");
+            return;
+        }
+        StdDraw.enableDoubleBuffering();
+        for(int i=0; i<size; i++)
+            for(int j=0; j<size; j++) {
+                if(!old)
+                    sites[i][j].draw();
+                else
+                    sites[i][j].drawOld();
+            }
         StdDraw.show();
         StdDraw.disableDoubleBuffering();
     }
@@ -162,29 +179,63 @@ public class PlaneBFS{
     }
 
     public void nextStep() {
-        if(totalSteps++ == 1)
+        if(totalSteps++ == 1) {
             current.setParent(null);
+            current.putInHeap();
+        }
         current.process();
         if(isValid(current.x(), current.y()+1)) {
-            sites[current.x()][current.y()+1].setParent(current);
-            putInQueue(current.x(), current.y()+1);
+            if(sites[current.x()][current.y()+1].inHeap()) {
+                if(sites[current.x()][current.y()+1].betterParent(current)) {
+                    sites[current.x()][current.y()+1].setParent(current);
+                    upDateInHeap(current.x(), current.y()+1);
+                }
+            }
+            else {
+                sites[current.x()][current.y()+1].setParent(current);
+                putInHeap(current.x(), current.y()+1);
+            }
         }
         if(isValid(current.x()+1, current.y())) {
-            sites[current.x()+1][current.y()].setParent(current);
-            putInQueue(current.x()+1, current.y());
+            if(sites[current.x()+1][current.y()].inHeap()) {
+                if(sites[current.x()+1][current.y()].betterParent(current)) {
+                    sites[current.x()+1][current.y()].setParent(current);
+                    upDateInHeap(current.x()+1, current.y());
+                }
+            }
+            else {
+                sites[current.x()+1][current.y()].setParent(current);
+                putInHeap(current.x()+1, current.y());
+            }
         }
         if(isValid(current.x(), current.y()-1)) {
-            sites[current.x()][current.y()-1].setParent(current);
-            putInQueue(current.x(), current.y()-1);
+            if(sites[current.x()][current.y()-1].inHeap()) {
+                if(sites[current.x()][current.y()-1].betterParent(current)) {
+                    sites[current.x()][current.y()-1].setParent(current);
+                    upDateInHeap(current.x(), current.y()-1);
+                }
+            }
+            else {
+                sites[current.x()][current.y()-1].setParent(current);
+                putInHeap(current.x(), current.y()-1);
+            }
         }
         if(isValid(current.x()-1, current.y())) {
-            sites[current.x()-1][current.y()].setParent(current);
-            putInQueue(current.x()-1, current.y());
+            if(sites[current.x()-1][current.y()].inHeap()) {
+                if(sites[current.x()-1][current.y()].betterParent(current)) {
+                    sites[current.x()-1][current.y()].setParent(current);
+                    upDateInHeap(current.x()-1, current.y());
+                }
+            }
+            else {
+                sites[current.x()-1][current.y()].setParent(current);
+                putInHeap(current.x()-1, current.y());
+            }
         }
         if(nodesInProcess.isEmpty())
             if(!traveled)
                 throw new IllegalStateException("This maze is not solvable.");
-        current = nodesInProcess.dequeue();
+        current = nodesInProcess.removeMin();
         if(current.x() == finalX && current.y() == finalY) {
             traveled = true;
             current.process();
@@ -195,14 +246,18 @@ public class PlaneBFS{
     private boolean isValid(int i, int j) {
         if(i<0 || i>=size || j<0 || j>= size)
             return false;
-        if(sites[i][j].processed() || sites[i][j].isBlocked() || sites[i][j].inQueue())
+        if(sites[i][j].processed() || sites[i][j].isBlocked())
             return false;
         return true;
     }
 
-    private void putInQueue(int i, int j) {
-        sites[i][j].queue();
-        nodesInProcess.enqueue(sites[i][j]);
+    private void putInHeap(int i, int j) {
+        sites[i][j].putInHeap();
+        nodesInProcess.Insert(sites[i][j]);
+    }
+
+    private void upDateInHeap(int i, int j) {
+        nodesInProcess.updateOnItem(sites[i][j]);
     }
 
     protected void showPath() {

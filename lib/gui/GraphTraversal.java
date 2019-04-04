@@ -210,11 +210,10 @@ class StartScreen implements ItemListener, ActionListener {
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new GridLayout(1, 1));
 
-        JPanel modePanel = new JPanel(new GridLayout(5, 1));
+        JPanel modePanel = new JPanel(new GridLayout(4, 1));
         modePanel.add(new JLabel("Algorithm: "+algo, JLabel.CENTER));
-        modePanel.add(new JLabel("", JLabel.CENTER));
         modePanel.add(new JLabel("MODES", JLabel.CENTER));
-        modePanel.add(new JLabel("PLANEMODE : The default mode, allows to run/pause the simulation.", JLabel.CENTER));
+        modePanel.add(new JLabel("PLANEMODE : This is the running phase of the simulation. (No changes are allowed)", JLabel.CENTER));
         modePanel.add(new JLabel("ADDMODE : This mode allows you to add/remove blocks/weights.", JLabel.CENTER));
         modePanel.setVisible(true);
         headerPanel.add(modePanel);
@@ -223,14 +222,13 @@ class StartScreen implements ItemListener, ActionListener {
 
 
         panel.removeAll();
-        panel.setLayout(new GridLayout(7, 1));
-        panel.add(new JLabel(""));
-        panel.add(new JLabel(""));
-        panel.add(new JLabel("Commands"));
-        panel.add(new JLabel("Run   : R (Run/Continue the set simulation) "));
-        panel.add(new JLabel("Set   : A (Change to ADDMODE) "));
-        panel.add(new JLabel("Pause : P (Pause during the simulation) "));
-        panel.add(new JLabel("Exit  : X (Exit a simulation) "));
+        panel.setLayout(new GridLayout(2, 1));
+        panel.add(new JLabel("<html><font face=\"Arial\"><b>Commands</b></font></html>"));
+        panel.add(new JLabel("<html><pre><font size=\"4\">Run            : R        (ADDMODE Decrease/Unblock) <br>" +
+                             "Set            : A        (ADDMODE Increase/Block) <br>" +
+                             "Terminal       : S/E      (Set Start/End) <br>" +
+                             "Start          : Enter    (Change to PLANEMODE) <br>" +
+                             "Exit           : X        (Exit a Simulation) </font></pre></html>"));
         panel.setVisible(true);
 
         JPanel footerPanel = new JPanel();
@@ -592,7 +590,7 @@ class Node {
     public void process() {
         try {
             assert(!block):"Node is blocked. Can't traverse it.";
-                this.color = StdDraw.RED;
+                this.color = new Color(250, 0, 100);
                 this.processed = true;
                 draw();
         }
@@ -604,7 +602,7 @@ class Node {
     public void finalise() {
         try {
             assert(processed):"Node is not yet processed. Can't finalise it.";
-                this.color = StdDraw.BLUE;
+                this.color = new Color(100, 0, 250);
                 draw();
         }
         catch(AssertionError e) {
@@ -614,10 +612,10 @@ class Node {
 
     public void draw() {
         StdDraw.setPenColor(color);
-        StdDraw.filledSquare(x+0.5, y+0.5, 0.5);
+        StdDraw.filledCircle(x+0.5, y+0.5, 0.5);
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.0005);
-        StdDraw.square(x+0.5, y+0.5, 0.5);
+        StdDraw.circle(x+0.5, y+0.5, 0.5);
     }
 }
 
@@ -690,6 +688,7 @@ class PlaneBFS{
     private void startSimulation() {
         int start = 0;
         int mode = 0;
+        boolean sSet = false, eSet = false;
         int startSet=0, endSet=0;
         while(true) {
 
@@ -719,24 +718,26 @@ class PlaneBFS{
 
 
                 if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-                    while(startSet==0) {
+                    while(!sSet && startSet==0) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setStartPosition(x, y);
+                            sSet = true;
                             startSet = 1;
                             break;
                         }
                     }
                 }
                 if(StdDraw.isKeyPressed(KeyEvent.VK_E)) {
-                    while(endSet==0) {
+                    while(!eSet && endSet==0) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setEndPosition(x, y);
+                            eSet = true;
                             endSet = 1;
                             break;
                         }
@@ -770,6 +771,7 @@ class PlaneBFS{
     protected void BuildGrid(int size) {
         int height = (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.2);
         StdDraw.setCanvasSize(height, height);
+        StdDraw.frame.setTitle("BFS");
         StdDraw.setXscale(-1, size+1);
         StdDraw.setYscale(-1, size+1);
         StdDraw.setPenRadius(0.005);
@@ -784,7 +786,7 @@ class PlaneBFS{
             if(this.current.isBlocked())
                 this.current.unblock();
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -805,7 +807,7 @@ class PlaneBFS{
             if(this.sites[i][j].isBlocked())
                 this.sites[i][j].unblock();
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");
@@ -953,6 +955,7 @@ class PlaneDFS {
     private void startSimulation() {
         int start = 0;
         int mode = 0;
+        boolean sSet = false, eSet = false;
         while(true) {
 
             if(start == 0) {
@@ -981,23 +984,25 @@ class PlaneDFS {
 
 
                 if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-                    while(true) {
+                    while(!sSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setStartPosition(x, y);
+                            sSet = true;
                             break;
                         }
                     }
                 }
                 if(StdDraw.isKeyPressed(KeyEvent.VK_E)) {
-                    while(true) {
+                    while(!eSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setEndPosition(x, y);
+                            eSet = true;
                             break;
                         }
                     }
@@ -1030,6 +1035,7 @@ class PlaneDFS {
     protected void BuildGrid(int size) {
         int height = (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.2);
         StdDraw.setCanvasSize(height, height);
+        StdDraw.frame.setTitle("DFS");
         StdDraw.setXscale(-1, size+1);
         StdDraw.setYscale(-1, size+1);
         StdDraw.setPenRadius(0.005);
@@ -1044,7 +1050,7 @@ class PlaneDFS {
             if(this.current.isBlocked())
                 this.current.unblock();
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -1064,8 +1070,8 @@ class PlaneDFS {
             this.finalY = j;
             if(this.sites[i][j].isBlocked())
                 this.sites[i][j].unblock();
-            StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");
@@ -1229,6 +1235,7 @@ class PlaneGreedyBFS{
     private void startSimulation() {
         int start = 0;
         int mode = 0;
+        boolean sSet = false, eSet = false;
         while(true) {
 
             if(start == 0) {
@@ -1257,23 +1264,25 @@ class PlaneGreedyBFS{
 
 
                 if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-                    while(true) {
+                    while(!sSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setStartPosition(x, y);
+                            sSet = true;
                             break;
                         }
                     }
                 }
                 if(StdDraw.isKeyPressed(KeyEvent.VK_E)) {
-                    while(true) {
+                    while(!eSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setEndPosition(x, y);
+                            eSet = true;
                             break;
                         }
                     }
@@ -1306,6 +1315,7 @@ class PlaneGreedyBFS{
     protected void BuildGrid(int size) {
         int height = (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.2);
         StdDraw.setCanvasSize(height, height);
+        StdDraw.frame.setTitle("Greedy BFS");
         StdDraw.setXscale(-1, size+1);
         StdDraw.setYscale(-1, size+1);
         StdDraw.setPenRadius(0.005);
@@ -1320,7 +1330,7 @@ class PlaneGreedyBFS{
             if(this.current.isBlocked())
                 this.current.unblock();
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -1345,7 +1355,7 @@ class PlaneGreedyBFS{
                     sites[x][y].setHeuristicValue(i, j);
                 }
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");
@@ -1523,9 +1533,9 @@ class NodeDijkstra extends Node implements Comparable<NodeDijkstra> {
 
     public void drawOld() {
         StdDraw.setPenColor(oldColor);
-        StdDraw.filledSquare(x+0.5, y+0.5, 0.5);
+        StdDraw.filledCircle(x+0.5, y+0.5, 0.5);
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.square(x+0.5, y+0.5, 0.5);
+        StdDraw.circle(x+0.5, y+0.5, 0.5);
         if(oldColor.getRed() < 100)
             StdDraw.setPenColor(StdDraw.WHITE);
         StdDraw.text(x+0.5, y+0.5, this.cost+"");
@@ -1555,6 +1565,7 @@ class PlaneDijkstra{
     private void startSimulation() {
         int start = 0;
         int mode = 0;
+        boolean sSet = false, eSet = false;
         while(true) {
 
             if(start == 0) {
@@ -1577,23 +1588,25 @@ class PlaneDijkstra{
 
 
                 if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-                    while(true) {
+                    while(!sSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setStartPosition(x, y);
+                            sSet = true;
                             break;
                         }
                     }
                 }
                 if(StdDraw.isKeyPressed(KeyEvent.VK_E)) {
-                    while(true) {
+                    while(!eSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setEndPosition(x, y);
+                            eSet = true;
                             break;
                         }
                     }
@@ -1626,6 +1639,7 @@ class PlaneDijkstra{
     protected void BuildGrid(int size) {
         int height = (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.2);
         StdDraw.setCanvasSize(height, height);
+        StdDraw.frame.setTitle("Dijkstra");
         StdDraw.setXscale(-1, size+1);
         StdDraw.setYscale(-1, size+1);
         StdDraw.setPenRadius(0.005);
@@ -1638,7 +1652,7 @@ class PlaneDijkstra{
                 throw new IllegalArgumentException();
             this.current = sites[i][j];
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -1657,7 +1671,7 @@ class PlaneDijkstra{
             this.finalX = i;
             this.finalY = j;
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");
@@ -1895,9 +1909,9 @@ class NodeA_Star extends Node implements Comparable<NodeA_Star> {
     public void drawOld() {
         if(!block) {
             StdDraw.setPenColor(oldColor);
-            StdDraw.filledSquare(x+0.5, y+0.5, 0.5);
+            StdDraw.filledCircle(x+0.5, y+0.5, 0.5);
             StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.square(x+0.5, y+0.5, 0.5);
+            StdDraw.circle(x+0.5, y+0.5, 0.5);
             if(oldColor.getRed() < 100)
                 StdDraw.setPenColor(StdDraw.WHITE);
             StdDraw.text(x+0.5, y+0.5, "1");
@@ -1928,6 +1942,7 @@ class PlaneA_Star{
     private void startSimulation() {
         int start = 0;
         int mode = 0;
+        boolean sSet = false, eSet = false;
         while(true) {
 
             if(start == 0) {
@@ -1956,23 +1971,25 @@ class PlaneA_Star{
 
 
                 if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-                    while(true) {
+                    while(!sSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setStartPosition(x, y);
+                            sSet = true;
                             break;
                         }
                     }
                 }
                 if(StdDraw.isKeyPressed(KeyEvent.VK_E)) {
-                    while(true) {
+                    while(!eSet && true) {
                         mode = 0;
                         if(StdDraw.isMousePressed()) {
                             int x = (int)StdDraw.mouseX();
                             int y = (int)StdDraw.mouseY();
                             setEndPosition(x, y);
+                            eSet = true;
                             break;
                         }
                     }
@@ -2005,6 +2022,7 @@ class PlaneA_Star{
     protected void BuildGrid(int size) {
         int height = (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.2);
         StdDraw.setCanvasSize(height, height);
+        StdDraw.frame.setTitle("A Star");
         StdDraw.setXscale(-1, size+1);
         StdDraw.setYscale(-1, size+1);
         StdDraw.setPenRadius(0.005);
@@ -2017,7 +2035,7 @@ class PlaneA_Star{
                 throw new IllegalArgumentException();
             this.current = sites[i][j];
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -2039,7 +2057,7 @@ class PlaneA_Star{
                 for(NodeA_Star node: L)
                     node.setGreedyValue(i, j);
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");

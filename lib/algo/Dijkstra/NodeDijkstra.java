@@ -83,9 +83,9 @@ public class NodeDijkstra extends Node implements Comparable<NodeDijkstra> {
 
     public void drawOld() {
         StdDraw.setPenColor(oldColor);
-        StdDraw.filledSquare(x+0.5, y+0.5, 0.5);
+        StdDraw.filledCircle(x+0.5, y+0.5, 0.5);
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.square(x+0.5, y+0.5, 0.5);
+        StdDraw.circle(x+0.5, y+0.5, 0.5);
         if(oldColor.getRed() < 100)
             StdDraw.setPenColor(StdDraw.WHITE);
         StdDraw.text(x+0.5, y+0.5, this.cost+"");

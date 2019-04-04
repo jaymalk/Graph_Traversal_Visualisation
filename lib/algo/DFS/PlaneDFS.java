@@ -114,7 +114,7 @@ public class PlaneDFS {
             if(this.current.isBlocked())
                 this.current.unblock();
             StdDraw.setPenColor(StdDraw.GREEN);
-            StdDraw.filledSquare(i+0.5, j+0.5, 0.5);
+            StdDraw.filledCircle(i+0.5, j+0.5, 0.5);
 
         }
         catch(IllegalArgumentException e) {
@@ -135,7 +135,7 @@ public class PlaneDFS {
             if(this.sites[i][j].isBlocked())
                 this.sites[i][j].unblock();
             StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
-            StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
+            StdDraw.filledCircle(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
             System.out.println("Indexes are out of bound.");

@@ -87,9 +87,9 @@ public class NodeA_Star extends Node implements Comparable<NodeA_Star> {
     public void drawOld() {
         if(!block) {
             StdDraw.setPenColor(oldColor);
-            StdDraw.filledSquare(x+0.5, y+0.5, 0.5);
+            StdDraw.filledCircle(x+0.5, y+0.5, 0.5);
             StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.square(x+0.5, y+0.5, 0.5);
+            StdDraw.circle(x+0.5, y+0.5, 0.5);
             if(oldColor.getRed() < 100)
                 StdDraw.setPenColor(StdDraw.WHITE);
             StdDraw.text(x+0.5, y+0.5, "1");
