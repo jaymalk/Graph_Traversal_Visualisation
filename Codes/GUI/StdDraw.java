@@ -665,6 +665,10 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
         init();
     }
 
+    public static void hideFrame() {
+        if(frame != null) frame.setVisible(false);
+    }
+
     // init
     private static void init() {
         if (frame != null) frame.setVisible(false);
@@ -1887,6 +1891,12 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
     public void keyReleased(KeyEvent e) {
         synchronized (keyLock) {
             keysDown.remove(e.getKeyCode());
+        }
+    }
+
+    public static void keyRemove(int keycode) {
+        synchronized (keyLock) {
+            keysDown.remove(keycode);
         }
     }
 

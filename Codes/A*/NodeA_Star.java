@@ -9,9 +9,8 @@ public class NodeA_Star extends Node implements Comparable<NodeA_Star> {
     public NodeA_Star(int x, int y) {
         super(x, y);
         this.inHeap = false;
-        super.color = StdDraw.WHITE;
         this.dijkstraValue = 0;
-        this.oldColor = StdDraw.WHITE;
+        this.oldColor = super.color;
         this.greedyValue = -x*x-y*y;
     }
 

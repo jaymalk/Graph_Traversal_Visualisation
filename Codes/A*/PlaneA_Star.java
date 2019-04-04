@@ -1,5 +1,5 @@
-import java.awt.Font;
-import java.awt.Toolkit;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class PlaneA_Star{
     protected int size, totalSteps, finalX, finalY;
@@ -18,6 +18,83 @@ public class PlaneA_Star{
         this.sites = new NodeA_Star[size][size];
         BuildGrid(size);
         showGrid();
+        startSimulation();
+    }
+
+    private void startSimulation() {
+        int start = 0;
+        int mode = 0;
+        while(true) {
+
+            if(start == 0) {
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_A))
+                    mode = 1;
+                if(StdDraw.isKeyPressed(KeyEvent.VK_R))
+                    mode = 2;
+
+                try {
+                    if(StdDraw.isMousePressed()) {
+                        int x = (int)StdDraw.mouseX();
+                        int y = (int)StdDraw.mouseY();
+                        if(mode == 2) {
+                            sites[x][y].unblock();
+                        }
+                        else if(mode == 1) {
+                            sites[x][y].block();
+                        }
+                    }
+                }
+                catch(Exception e) {}
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_ENTER))
+                    start = 1;
+
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
+                    while(true) {
+                        mode = 0;
+                        if(StdDraw.isMousePressed()) {
+                            int x = (int)StdDraw.mouseX();
+                            int y = (int)StdDraw.mouseY();
+                            setStartPosition(x, y);
+                            break;
+                        }
+                    }
+                }
+                if(StdDraw.isKeyPressed(KeyEvent.VK_E)) {
+                    while(true) {
+                        mode = 0;
+                        if(StdDraw.isMousePressed()) {
+                            int x = (int)StdDraw.mouseX();
+                            int y = (int)StdDraw.mouseY();
+                            setEndPosition(x, y);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            else if(start == 1) {
+                try {
+                    Thread.sleep(1);
+                    nextStep();
+                }
+                catch(Exception e){};
+
+                if(StdDraw.isKeyPressed(KeyEvent.VK_ENTER))
+                    start = 2;
+            }
+
+            else {
+                if(StdDraw.isKeyPressed(KeyEvent.VK_ENTER))
+                    start = 1;
+            }
+
+            if(StdDraw.isKeyPressed(KeyEvent.VK_X)) {
+                return;
+            }
+        }
     }
 
     protected void BuildGrid(int size) {
@@ -56,7 +133,7 @@ public class PlaneA_Star{
             for(NodeA_Star[] L: sites)
                 for(NodeA_Star node: L)
                     node.setGreedyValue(i, j);
-            StdDraw.setPenColor(StdDraw.GREEN);
+            StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
             StdDraw.filledSquare(finalX+0.5, finalY+0.5, 0.5);
         }
         catch(IllegalArgumentException  e) {
