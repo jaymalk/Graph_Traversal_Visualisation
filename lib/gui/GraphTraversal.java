@@ -704,6 +704,15 @@ class PlaneBFS{
                     if(StdDraw.isMousePressed()) {
                         int x = (int)StdDraw.mouseX();
                         int y = (int)StdDraw.mouseY();
+                        if(finalX == x && finalY == y)
+                            continue;
+                        if(current != null) {
+                            if(x == current.x() && y == current.y())
+                                continue;
+                        }
+                        else
+                            if(x == 0 && y == 0)
+                                continue;
                         if(mode == 2) {
                             sites[x][y].unblock();
                         }
@@ -970,6 +979,15 @@ class PlaneDFS {
                     if(StdDraw.isMousePressed()) {
                         int x = (int)StdDraw.mouseX();
                         int y = (int)StdDraw.mouseY();
+                        if(finalX == x && finalY == y)
+                            continue;
+                        if(current != null) {
+                            if(x == current.x() && y == current.y())
+                                continue;
+                        }
+                        else
+                            if(x == 0 && y == 0)
+                                continue;
                         if(mode == 2) {
                             sites[x][y].unblock();
                         }
@@ -1250,6 +1268,15 @@ class PlaneGreedyBFS{
                     if(StdDraw.isMousePressed()) {
                         int x = (int)StdDraw.mouseX();
                         int y = (int)StdDraw.mouseY();
+                        if(finalX == x && finalY == y)
+                            continue;
+                        if(current != null) {
+                            if(x == current.x() && y == current.y())
+                                continue;
+                        }
+                        else
+                            if(x == 0 && y == 0)
+                                continue;
                         if(mode == 2) {
                             sites[x][y].unblock();
                         }
@@ -1578,6 +1605,15 @@ class PlaneDijkstra{
                     if(StdDraw.isMousePressed()) {
                         int x = (int)StdDraw.mouseX();
                         int y = (int)StdDraw.mouseY();
+                        if(finalX == x && finalY == y)
+                            continue;
+                        if(current != null) {
+                            if(x == current.x() && y == current.y())
+                                continue;
+                        }
+                        else
+                            if(x == 0 && y == 0)
+                                continue;
                         if(mode == 1)
                             sites[x][y].increaseCost();
                     }
@@ -1957,6 +1993,15 @@ class PlaneA_Star{
                     if(StdDraw.isMousePressed()) {
                         int x = (int)StdDraw.mouseX();
                         int y = (int)StdDraw.mouseY();
+                        if(finalX == x && finalY == y)
+                            continue;
+                        if(current != null) {
+                            if(x == current.x() && y == current.y())
+                                continue;
+                        }
+                        else
+                            if(x == 0 && y == 0)
+                                continue;
                         if(mode == 2) {
                             sites[x][y].unblock();
                         }
