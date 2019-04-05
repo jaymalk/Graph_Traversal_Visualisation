@@ -31,6 +31,7 @@ class mediumInterface {
         startVisualisation(algo, size);
 
         StdDraw.hideFrame();
+        StdDraw.frame.dispose();
 
         EndScreen esn = new EndScreen();
         while(!esn.flag)
