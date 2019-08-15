@@ -13,3 +13,36 @@ Use `make run` to run the simulation and try various algorithms. There are vario
 
   - *Start*  : Enter (Change to PLANEMODE) 
   - *Exit*   : X (Exit a Simulation)
+
+#### Preview
+
+
+
+- BFS
+
+<img src="./readme_files/bfs.gif" align="center"></img>
+
+
+
+
+
+- DFS
+
+<img src="./readme_files/dfs.gif" align="center"></img>
+
+
+
+
+
+- Greedy BFS
+
+<img src="./readme_files/gbfs.gif" align="center"></img>
+
+
+
+
+
+- A*
+
+<img src="./readme_files/a_star.gif" align="center"></img>
+
